@@ -27,7 +27,6 @@ public class PositionBookController {
 
     @PostMapping("/createEvent")
     public PositionsDto createEvent(@RequestBody EventsDto events) {
-        Positions positions = positionBookService.createTradeEvent(PositionBookMapper.toEventDomain(events));
-        return null;
+        return PositionBookMapper.toPositionsDto(positionBookService.createTradeEvent(PositionBookMapper.toEventDomain(events)));
     }
 }

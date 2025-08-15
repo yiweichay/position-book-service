@@ -1,9 +1,6 @@
 package com.example.positionbookservice.service;
 
-import com.example.positionbookservice.entity.Event;
-import com.example.positionbookservice.entity.Events;
-import com.example.positionbookservice.entity.Position;
-import com.example.positionbookservice.entity.Positions;
+import com.example.positionbookservice.entity.*;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -21,6 +18,7 @@ public class PositionBookService {
         Positions response = new Positions();
         Map<String, List<Event>> tempPositionBook = new HashMap<>();
         Map<String, Integer> tempQuantity = new HashMap<>();
+        Map<Integer, Event> idToEventMap = new HashMap<>();
 
         for ( Event event: events.getEvents()) {
             final String key = event.getAccount() + "-" + event.getSecurity();
@@ -31,9 +29,22 @@ public class PositionBookService {
             switch (event.getAction()) {
                 case BUY:
                     currentTotal += event.getQuantity();
+                    idToEventMap.put(event.getId(), event);
                     break;
                 case SELL:
                     currentTotal -= event.getQuantity();
+                    idToEventMap.put(event.getId(), event);
+                    break;
+                case CANCEL:
+                    final Event originalEvent = idToEventMap.get(event.getId());
+                    if (originalEvent != null) {
+                        if (originalEvent.getAction() == ActionType.BUY) {
+                            currentTotal -= originalEvent.getQuantity();
+                        } else if (originalEvent.getAction() == ActionType.SELL) {
+                            currentTotal += originalEvent.getQuantity();
+                        }
+                        idToEventMap.remove(event.getId());
+                    }
                     break;
                 default:
                     throw new IllegalArgumentException("Unknown action type: " + event.getAction());

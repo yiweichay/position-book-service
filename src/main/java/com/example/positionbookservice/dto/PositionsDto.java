@@ -13,5 +13,5 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PositionsDto {
-    private List<Position> positions;
+    private List<PositionDto> positions;
 }
