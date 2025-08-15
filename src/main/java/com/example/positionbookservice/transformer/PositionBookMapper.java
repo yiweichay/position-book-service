@@ -12,9 +12,9 @@ public class PositionBookMapper {
     }
 
     public static PositionsDto toPositionsDto(final Positions positions) {
-        return PositionsDto.builder()
+        return (positions.getPositions() != null) ? PositionsDto.builder()
                 .positions(positions.getPositions().stream().map(PositionBookMapper::toPositionDto).toList())
-                .build();
+                .build() : null;
     }
 
     private static PositionDto toPositionDto(final Position position) {
