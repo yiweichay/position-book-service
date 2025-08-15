@@ -11,8 +11,8 @@ import java.util.Map;
 @Service
 public class PositionBookService {
 
-    // account -> security -> list of events
     private final Map<String, List<Event>> positionBook = new HashMap<>();
+    private final Map<String, Integer> totalQuantityMap = new HashMap<>();
 
     public Positions createTradeEvent(final Events events){
         Positions response = new Positions();
@@ -23,16 +23,21 @@ public class PositionBookService {
         for ( Event event: events.getEvents()) {
             final String key = event.getAccount() + "-" + event.getSecurity();
             List<Event> eventList = tempPositionBook.computeIfAbsent(key, k -> new ArrayList<>());
+            List<Event> persistedEventList = positionBook.computeIfAbsent(key, k -> new ArrayList<>());
             eventList.add(event);
+            persistedEventList.add(event);
 
             int currentTotal = tempQuantity.getOrDefault(key, 0);
+            int persistedTotal = totalQuantityMap.getOrDefault(key, 0);
             switch (event.getAction()) {
                 case BUY:
                     currentTotal += event.getQuantity();
+                    persistedTotal += event.getQuantity();
                     idToEventMap.put(event.getId(), event);
                     break;
                 case SELL:
                     currentTotal -= event.getQuantity();
+                    persistedTotal -= event.getQuantity();
                     idToEventMap.put(event.getId(), event);
                     break;
                 case CANCEL:
@@ -40,8 +45,10 @@ public class PositionBookService {
                     if (originalEvent != null) {
                         if (originalEvent.getAction() == ActionType.BUY) {
                             currentTotal -= originalEvent.getQuantity();
+                            persistedTotal -= originalEvent.getQuantity();
                         } else if (originalEvent.getAction() == ActionType.SELL) {
                             currentTotal += originalEvent.getQuantity();
+                            persistedTotal += originalEvent.getQuantity();
                         }
                         idToEventMap.remove(event.getId());
                     }
@@ -50,6 +57,7 @@ public class PositionBookService {
                     throw new IllegalArgumentException("Unknown action type: " + event.getAction());
             }
             tempQuantity.put(key, currentTotal);
+            totalQuantityMap.put(key, persistedTotal);
         }
 
         for (final String key: tempPositionBook.keySet()) {
@@ -62,6 +70,27 @@ public class PositionBookService {
                     .security(security)
                     .quantity(tempQuantity.get(key))
                     .events(eventLIst)
+                    .build();
+            response.getPositions().add(position);
+        }
+        return response;
+    }
+
+    public Positions getAllPositions() {
+        Positions response = new Positions();
+        for (Map.Entry<String, List<Event>> entry : positionBook.entrySet()) {
+            String key = entry.getKey();
+            List<Event> events = entry.getValue();
+            String[] parts = key.split("-", 2);
+            String account = parts[0];
+            String security = parts[1];
+            int quantity = totalQuantityMap.getOrDefault(key, 0);
+
+            Position position = Position.builder()
+                    .account(account)
+                    .security(security)
+                    .quantity(quantity)
+                    .events(events)
                     .build();
             response.getPositions().add(position);
         }
