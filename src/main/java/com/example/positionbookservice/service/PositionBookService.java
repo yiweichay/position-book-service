@@ -28,8 +28,8 @@ public class PositionBookService {
             eventList.add(event);
             persistedEventList.add(event);
 
-            final int currentTotal = tempQuantity.getOrDefault(key, 0);
-            final int persistedTotal = totalQuantityMap.getOrDefault(key, 0);
+            int currentTotal = tempQuantity.getOrDefault(key, 0);
+            int persistedTotal = totalQuantityMap.getOrDefault(key, 0);
             switch (event.getAction()) {
                 case BUY:
                     currentTotal += event.getQuantity();
