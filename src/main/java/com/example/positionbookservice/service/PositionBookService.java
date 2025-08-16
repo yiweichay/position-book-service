@@ -1,6 +1,7 @@
 package com.example.positionbookservice.service;
 
 import com.example.positionbookservice.entity.*;
+import com.example.positionbookservice.exception.InvalidTradeEventException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -15,20 +16,20 @@ public class PositionBookService {
     private final Map<String, Integer> totalQuantityMap = new HashMap<>();
 
     public Positions createTradeEvent(final Events events){
-        Positions response = new Positions();
-        Map<String, List<Event>> tempPositionBook = new HashMap<>();
-        Map<String, Integer> tempQuantity = new HashMap<>();
-        Map<Integer, Event> idToEventMap = new HashMap<>();
+        final Positions response = new Positions();
+        final Map<String, List<Event>> tempPositionBook = new HashMap<>();
+        final Map<String, Integer> tempQuantity = new HashMap<>();
+        final Map<Integer, Event> idToEventMap = new HashMap<>();
 
-        for ( Event event: events.getEvents()) {
+        for ( final Event event: events.getEvents()) {
             final String key = event.getAccount() + "-" + event.getSecurity();
-            List<Event> eventList = tempPositionBook.computeIfAbsent(key, k -> new ArrayList<>());
-            List<Event> persistedEventList = positionBook.computeIfAbsent(key, k -> new ArrayList<>());
+            final List<Event> eventList = tempPositionBook.computeIfAbsent(key, k -> new ArrayList<>());
+            final List<Event> persistedEventList = positionBook.computeIfAbsent(key, k -> new ArrayList<>());
             eventList.add(event);
             persistedEventList.add(event);
 
-            int currentTotal = tempQuantity.getOrDefault(key, 0);
-            int persistedTotal = totalQuantityMap.getOrDefault(key, 0);
+            final int currentTotal = tempQuantity.getOrDefault(key, 0);
+            final int persistedTotal = totalQuantityMap.getOrDefault(key, 0);
             switch (event.getAction()) {
                 case BUY:
                     currentTotal += event.getQuantity();
@@ -54,7 +55,7 @@ public class PositionBookService {
                     }
                     break;
                 default:
-                    throw new IllegalArgumentException("Unknown action type: " + event.getAction());
+                    throw new InvalidTradeEventException("Unknown action type: " + event.getAction());
             }
             tempQuantity.put(key, currentTotal);
             totalQuantityMap.put(key, persistedTotal);
@@ -77,16 +78,16 @@ public class PositionBookService {
     }
 
     public Positions getAllPositions() {
-        Positions response = new Positions();
+        final Positions response = new Positions();
         for (Map.Entry<String, List<Event>> entry : positionBook.entrySet()) {
-            String key = entry.getKey();
-            List<Event> events = entry.getValue();
-            String[] parts = key.split("-", 2);
-            String account = parts[0];
-            String security = parts[1];
-            int quantity = totalQuantityMap.getOrDefault(key, 0);
+            final String key = entry.getKey();
+            final List<Event> events = entry.getValue();
+            final String[] parts = key.split("-", 2);
+            final String account = parts[0];
+            final String security = parts[1];
+            final int quantity = totalQuantityMap.getOrDefault(key, 0);
 
-            Position position = Position.builder()
+            final Position position = Position.builder()
                     .account(account)
                     .security(security)
                     .quantity(quantity)
