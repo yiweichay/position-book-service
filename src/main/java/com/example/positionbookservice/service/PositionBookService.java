@@ -24,6 +24,11 @@ public class PositionBookService {
         return getAllPositions();
     }
 
+    public Positions createSingleTradeEvent(final Event event) {
+        addSingleTradeEvent(event);
+        return getAllPositions();
+    }
+
     public Positions getAllPositions() {
         final Positions response = new Positions();
         for (Map.Entry<PositionBookKey, List<Event>> entry : positionBook.entrySet()) {
@@ -42,11 +47,6 @@ public class PositionBookService {
             response.getPositions().add(position);
         }
         return response;
-    }
-
-    public Positions createSingleTradeEvent(final Event event) {
-        addSingleTradeEvent(event);
-        return getAllPositions();
     }
 
     private void addSingleTradeEvent(final Event event) {
