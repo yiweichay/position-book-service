@@ -2,7 +2,6 @@ package com.example.positionbookservice.controller;
 
 import com.example.positionbookservice.dto.EventDto;
 import com.example.positionbookservice.dto.EventsDto;
-import com.example.positionbookservice.dto.PositionDto;
 import com.example.positionbookservice.dto.PositionsDto;
 import com.example.positionbookservice.service.PositionBookService;
 import com.example.positionbookservice.transformer.PositionBookMapper;

@@ -3,9 +3,9 @@ package com.example.positionbookservice.exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-public class InvalidTradeEventException extends RuntimeException {
-    public InvalidTradeEventException(String message) {
+@ResponseStatus(HttpStatus.NOT_FOUND)
+public class TradeEventNotFoundException extends RuntimeException {
+    public TradeEventNotFoundException(String message) {
         super(message);
     }
 }

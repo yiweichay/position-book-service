@@ -2,6 +2,7 @@ package com.example.positionbookservice.service;
 
 import com.example.positionbookservice.entity.*;
 import com.example.positionbookservice.exception.InvalidTradeEventException;
+import com.example.positionbookservice.exception.TradeEventNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -73,6 +74,8 @@ public class PositionBookService {
                         persistedTotal += originalEvent.getQuantity();
                     }
                     idEventMap.remove(event.getId());
+                } else {
+                    throw new TradeEventNotFoundException("Event with id " + event.getId() + " not found");
                 }
                 break;
             default:
