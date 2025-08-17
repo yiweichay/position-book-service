@@ -15,7 +15,7 @@ The main data structure that was used in the project is a HashMap.
 Three HashMaps were used to store the position book, the totalQuantity of trades per account per security, and an idEventMap to map event IDs to their respective events for quick access to the actionType.
 
 ### Exceptions
-- **InvalidTradeEventException**: Thrown when an invalid trade action type is used. [HTTP status code: 500 internal server error]
+- **InvalidTradeEventException**: Thrown when an invalid trade action type is used or when a CANCEL event is executed for the wrong account/security. [HTTP status code: 500 internal server error]
 - **TradeEventIDNotFoundException**: Thrown for cancel trade events when the given ID is not found. [HTTP status code: 404 not found]
 - **DuplicatedEventIDBadRequestException**: Thrown when the given trade event ID already exists in the position book for BUY/SELL events. [HTTP status code: 400 bad request]
 
