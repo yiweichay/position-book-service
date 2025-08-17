@@ -9,7 +9,7 @@ The system provides functionalities to add BUY/SELL/CANCEL trade events and retr
 - **POST /api/v1/createEvent**: Add a list of trade events (BUY/SELL/CANCEL).
 - **POST /api/v1/createSingleEvent**: Add a single trade event
 - **GET /api/v1/getPositionSummary**: Retrieve the current position book summary.
-- **GET /api/v1/getPositionSummary/{account}/{security}**: Retrieve the position summary for a specific account and security.
+- **GET /api/v1/getPosition/{account}/{security}**: Retrieve the position summary for a specific account and security.
 
 ### Data structures
 The main data structure that was used in the project is a HashMap. 
