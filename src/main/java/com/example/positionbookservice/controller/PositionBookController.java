@@ -24,18 +24,18 @@ public class PositionBookController {
     }
 
     @GetMapping("/getPosition/{account}/{security}")
-    public PositionDto getPosition(@PathVariable("account") final String account,
-                                   @PathVariable("security") final String security) {
+    public PositionDto getPosition(final @PathVariable("account") String account,
+                                   final @PathVariable("security") String security) {
         return PositionBookMapper.toPositionDto(positionBookService.getSpecificPosition(account, security));
     }
 
     @PostMapping("/createEvent")
-    public PositionsDto createEvent(@RequestBody EventsDto events) {
+    public PositionsDto createEvent(final @RequestBody EventsDto events) {
         return PositionBookMapper.toPositionsDto(positionBookService.createTradeEvent(PositionBookMapper.toEventDomain(events)));
     }
 
     @PostMapping("/createSingleEvent")
-    public PositionsDto createSingleEvent(@RequestBody EventDto event) {
+    public PositionsDto createSingleEvent(final @RequestBody EventDto event) {
         return PositionBookMapper.toPositionsDto(positionBookService.createSingleTradeEvent(PositionBookMapper.toEventDomain(event)));
     }
 }
