@@ -82,6 +82,21 @@ public class PositionBookServiceTest {
     }
 
     @Test
+    void testGetSpecificPositionSummary() {
+        final PositionBookService positionBookService = new PositionBookService();
+
+        Event buyEvent1 = new Event(1, ActionType.BUY, "ACC1", "SEC1", 100);
+        Event buyEvent2 = new Event(2, ActionType.BUY, "ACC1", "SEC1", 200);
+        Events events = new Events();
+        events.getEvents().add(buyEvent1);
+        events.getEvents().add(buyEvent2);
+
+        positionBookService.createTradeEvent(events);
+
+        assertEquals(300, positionBookService.getSpecificPosition("ACC1", "SEC1").getQuantity());
+    }
+
+    @Test
     void throwExceptionWhenIDExists() {
         final PositionBookService positionBookService = new PositionBookService();
 
