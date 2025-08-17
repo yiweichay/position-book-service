@@ -68,8 +68,6 @@ public class PositionBookService {
     private void addSingleTradeEvent(final Event event) {
         checkIfIDExists(event);
         final PositionBookKey positionBookKey = new PositionBookKey(event.getAccount(), event.getSecurity());
-        final List<Event> eventList = positionBook.computeIfAbsent(positionBookKey, k -> new ArrayList<>());
-        eventList.add(event);
 
         int totalQuantity = totalQuantityMap.getOrDefault(positionBookKey, 0);
         switch (event.getAction()) {
@@ -84,6 +82,9 @@ public class PositionBookService {
             case CANCEL:
                 final Event originalEvent = idEventMap.get(event.getId());
                 if (originalEvent != null) {
+                    if (!originalEvent.getAccount().equals(event.getAccount()) || !originalEvent.getSecurity().equals(event.getSecurity())) {
+                        throw new InvalidTradeEventException("Cannot cancel event with different account or security");
+                    }
                     if (originalEvent.getAction() == ActionType.BUY) {
                         totalQuantity -= originalEvent.getQuantity();
                     } else if (originalEvent.getAction() == ActionType.SELL) {
@@ -98,6 +99,8 @@ public class PositionBookService {
                 throw new InvalidTradeEventException("Unknown action type: " + event.getAction());
         }
         totalQuantityMap.put(positionBookKey, totalQuantity);
+        final List<Event> eventList = positionBook.computeIfAbsent(positionBookKey, k -> new ArrayList<>());
+        eventList.add(event);
     }
 
     private void checkIfIDExists(final Event event) {
