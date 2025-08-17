@@ -8,7 +8,7 @@ import com.example.positionbookservice.service.PositionBookService;
 import com.example.positionbookservice.transformer.PositionBookMapper;
 import org.springframework.web.bind.annotation.*;
 
-@RequestMapping("/api")
+@RequestMapping("/api/v1")
 @RestController
 public class PositionBookController {
 
