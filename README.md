@@ -1,1 +1,34 @@
 # Position Book System
+
+This is a position book system that allows users to manage their positions in various assets. 
+The system provides functionalities to add BUY/SELL/CANCEL trade events and retrieve a summary of the position book; data is kept in memory.
+
+## Features
+
+### REST API Endpoints
+- **POST /api/v1/createEvent**: Add a list of trade events (BUY/SELL/CANCEL).
+- **POST /api/v1/createSingleEvent**: Add a single trade event
+- **GET /api/v1/getPositionSummary**: Retrieve the current position book summary.
+
+### Data structures
+The main data structure that was used in the project is a HashMap. 
+3 different HashMaps were used store the position book, the totalQuantity of trades per account per security, and an idEventMap to map event IDs to their respective events for quick access to the actionType.
+
+### Exceptions
+- **InvalidTradeEventException**: Thrown when an invalid trade action type is used. [HTTP status code: 500 internal server error]
+- **TradeEventIDNotFoundException**: Thrown when a trade event ID is not found when the user wants to cancel a trade event. [HTTP status code: 404 not found]
+- **DuplicatedEventIDBadRequestException**: Thrown when a trade event with the same ID already exists in the system when the user wants to send a BUY/SELL event. [HTTP status code: 400 bad request]
+
+## Tech and Getting Started
+This project is built using Spring Boot and Gradle. To get started, you can clone the repository and run the application using the following commands:
+
+```
+./gradlew build
+./gradlew bootRun
+```
+
+To check the status of the application (healthcheck), navigate to the below URL:
+`http://localhost:8080/actuator/health`
+
+To run tests, run:
+`./gradlew test`

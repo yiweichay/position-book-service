@@ -53,26 +53,26 @@ public class PositionBookService {
     private void addSingleTradeEvent(final Event event) {
         checkIfIDExists(event);
         final PositionBookKey positionBookKey = new PositionBookKey(event.getAccount(), event.getSecurity());
-        final List<Event> persistedEventList = positionBook.computeIfAbsent(positionBookKey, k -> new ArrayList<>());
-        persistedEventList.add(event);
+        final List<Event> eventList = positionBook.computeIfAbsent(positionBookKey, k -> new ArrayList<>());
+        eventList.add(event);
 
-        int persistedTotal = totalQuantityMap.getOrDefault(positionBookKey, 0);
+        int totalQuantity = totalQuantityMap.getOrDefault(positionBookKey, 0);
         switch (event.getAction()) {
             case BUY:
-                persistedTotal += event.getQuantity();
+                totalQuantity += event.getQuantity();
                 idEventMap.put(event.getId(), event);
                 break;
             case SELL:
-                persistedTotal -= event.getQuantity();
+                totalQuantity -= event.getQuantity();
                 idEventMap.put(event.getId(), event);
                 break;
             case CANCEL:
                 final Event originalEvent = idEventMap.get(event.getId());
                 if (originalEvent != null) {
                     if (originalEvent.getAction() == ActionType.BUY) {
-                        persistedTotal -= originalEvent.getQuantity();
+                        totalQuantity -= originalEvent.getQuantity();
                     } else if (originalEvent.getAction() == ActionType.SELL) {
-                        persistedTotal += originalEvent.getQuantity();
+                        totalQuantity += originalEvent.getQuantity();
                     }
                     idEventMap.remove(event.getId());
                 } else {
@@ -82,7 +82,7 @@ public class PositionBookService {
             default:
                 throw new InvalidTradeEventException("Unknown action type: " + event.getAction());
         }
-        totalQuantityMap.put(positionBookKey, persistedTotal);
+        totalQuantityMap.put(positionBookKey, totalQuantity);
     }
 
     private void checkIfIDExists(final Event event) {
