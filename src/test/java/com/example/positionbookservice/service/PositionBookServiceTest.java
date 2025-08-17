@@ -6,6 +6,7 @@ import com.example.positionbookservice.entity.Events;
 import com.example.positionbookservice.entity.Positions;
 import com.example.positionbookservice.entity.Position;
 import com.example.positionbookservice.exception.DuplicatedEventIDBadRequestException;
+import com.example.positionbookservice.exception.InvalidTradeEventException;
 import com.example.positionbookservice.exception.TradeEventIDNotFoundException;
 import org.junit.jupiter.api.Test;
 
@@ -127,6 +128,23 @@ public class PositionBookServiceTest {
             positionBookService.createTradeEvent(events);
         } catch (final TradeEventIDNotFoundException e) {
             assertEquals("Event with id 2 not found for trade cancellation", e.getMessage());
+        }
+    }
+
+    @Test
+    void throwInvalidTradeEventExceptionWhenCancelWithDifferentAccountOrSecurity() {
+        final PositionBookService positionBookService = new PositionBookService();
+
+        Event buyEvent1 = new Event(1, ActionType.BUY, "ACC1", "SEC1", 100);
+        Event cancelEvent = new Event(1, ActionType.CANCEL, "ACC2", "SEC2", 0);
+        Events events = new Events();
+        events.getEvents().add(buyEvent1);
+
+        try {
+            positionBookService.createTradeEvent(events);
+            positionBookService.addSingleTradeEvent(cancelEvent);
+        } catch (final InvalidTradeEventException e) {
+            assertEquals("Cannot cancel event with different account or security", e.getMessage());
         }
     }
 }

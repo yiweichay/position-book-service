@@ -65,7 +65,7 @@ public class PositionBookService {
                 .build();
     }
 
-    private void addSingleTradeEvent(final Event event) {
+    public void addSingleTradeEvent(final Event event) {
         checkIfIDExists(event);
         final PositionBookKey positionBookKey = new PositionBookKey(event.getAccount(), event.getSecurity());
 
