@@ -12,12 +12,15 @@ The system provides functionalities to add BUY/SELL/CANCEL trade events and retr
 
 ### Data structures
 The main data structure that was used in the project is a HashMap. 
-3 different HashMaps were used store the position book, the totalQuantity of trades per account per security, and an idEventMap to map event IDs to their respective events for quick access to the actionType.
+Three HashMaps were used to store the position book, the totalQuantity of trades per account per security, and an idEventMap to map event IDs to their respective events for quick access to the actionType.
 
 ### Exceptions
 - **InvalidTradeEventException**: Thrown when an invalid trade action type is used. [HTTP status code: 500 internal server error]
-- **TradeEventIDNotFoundException**: Thrown when a trade event ID is not found when the user wants to cancel a trade event. [HTTP status code: 404 not found]
-- **DuplicatedEventIDBadRequestException**: Thrown when a trade event with the same ID already exists in the system when the user wants to send a BUY/SELL event. [HTTP status code: 400 bad request]
+- **TradeEventIDNotFoundException**: Thrown for cancel trade events when the given ID is not found. [HTTP status code: 404 not found]
+- **DuplicatedEventIDBadRequestException**: Thrown when the given trade event ID already exists in the position book for BUY/SELL events. [HTTP status code: 400 bad request]
+
+### CORS configuration
+Cross-Origin Resource Sharing (CORS) is configured to allow requests from http://localhost:3000
 
 ## Tech and Getting Started
 This project is built using Spring Boot and Gradle. To get started, you can clone the repository and run the application using the following commands:
