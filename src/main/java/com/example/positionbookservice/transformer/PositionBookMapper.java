@@ -27,7 +27,7 @@ public class PositionBookMapper {
                 .build() : null;
     }
 
-    private static PositionDto toPositionDto(final Position position) {
+    public static PositionDto toPositionDto(final Position position) {
         return PositionDto.builder()
                 .account(position.getAccount())
                 .security(position.getSecurity())

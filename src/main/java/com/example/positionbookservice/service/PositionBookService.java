@@ -50,6 +50,21 @@ public class PositionBookService {
         return response;
     }
 
+    public Position getSpecificPosition(final String account, final String security){
+        final PositionBookKey key = new PositionBookKey(account, security);
+        final List<Event> events = positionBook.get(key);
+        int totalQuantity = 0;
+        for (final Event event: events) {
+            totalQuantity += event.getQuantity();
+        }
+        return Position.builder()
+                .account(account)
+                .security(security)
+                .quantity(totalQuantity)
+                .events(events)
+                .build();
+    }
+
     private void addSingleTradeEvent(final Event event) {
         checkIfIDExists(event);
         final PositionBookKey positionBookKey = new PositionBookKey(event.getAccount(), event.getSecurity());
