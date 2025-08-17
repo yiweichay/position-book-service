@@ -32,7 +32,7 @@ public class PositionBookServiceTest {
         final PositionBookService positionBookService = new PositionBookService();
 
         Event buyEvent = new Event(1, ActionType.BUY, "ACC1", "SEC1", 100);
-        Event sellEvent = new Event(1, ActionType.SELL, "ACC1", "SEC1", 50);
+        Event sellEvent = new Event(2, ActionType.SELL, "ACC1", "SEC1", 50);
         Events events = new Events();
         events.getEvents().add(buyEvent);
         events.getEvents().add(sellEvent);
