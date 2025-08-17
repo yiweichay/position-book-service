@@ -13,8 +13,8 @@ import java.util.Map;
 @Service
 public class PositionBookService {
 
-    private final Map<String, List<Event>> positionBook = new HashMap<>();
-    private final Map<String, Integer> totalQuantityMap = new HashMap<>();
+    private final Map<PositionBookKey, List<Event>> positionBook = new HashMap<>();
+    private final Map<PositionBookKey, Integer> totalQuantityMap = new HashMap<>();
     private final Map<Integer, Event> idEventMap = new HashMap<>();
 
     public Positions createTradeEvent(final Events events){
@@ -26,12 +26,11 @@ public class PositionBookService {
 
     public Positions getAllPositions() {
         final Positions response = new Positions();
-        for (Map.Entry<String, List<Event>> entry : positionBook.entrySet()) {
-            final String key = entry.getKey();
+        for (Map.Entry<PositionBookKey, List<Event>> entry : positionBook.entrySet()) {
+            final PositionBookKey key = entry.getKey();
             final List<Event> events = entry.getValue();
-            final String[] parts = key.split("-", 2);
-            final String account = parts[0];
-            final String security = parts[1];
+            final String account = key.getAccount();
+            final String security = key.getSecurity();
             final int quantity = totalQuantityMap.getOrDefault(key, 0);
 
             final Position position = Position.builder()
@@ -51,11 +50,11 @@ public class PositionBookService {
     }
 
     private void addSingleTradeEvent(final Event event) {
-        final String key = event.getAccount() + "-" + event.getSecurity();
-        final List<Event> persistedEventList = positionBook.computeIfAbsent(key, k -> new ArrayList<>());
+        final PositionBookKey positionBookKey = new PositionBookKey(event.getAccount(), event.getSecurity());
+        final List<Event> persistedEventList = positionBook.computeIfAbsent(positionBookKey, k -> new ArrayList<>());
         persistedEventList.add(event);
 
-        int persistedTotal = totalQuantityMap.getOrDefault(key, 0);
+        int persistedTotal = totalQuantityMap.getOrDefault(positionBookKey, 0);
         switch (event.getAction()) {
             case BUY:
                 persistedTotal += event.getQuantity();
@@ -81,6 +80,6 @@ public class PositionBookService {
             default:
                 throw new InvalidTradeEventException("Unknown action type: " + event.getAction());
         }
-        totalQuantityMap.put(key, persistedTotal);
+        totalQuantityMap.put(positionBookKey, persistedTotal);
     }
 }
