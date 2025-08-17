@@ -11,6 +11,16 @@ public class PositionBookMapper {
                 .build();
     }
 
+    public static Event toEventDomain(final EventDto eventDto) {
+        return Event.builder()
+                .id(eventDto.getId())
+                .action(toActionTypeDomain(eventDto.getAction()))
+                .account(eventDto.getAccount())
+                .security(eventDto.getSecurity())
+                .quantity(eventDto.getQuantity())
+                .build();
+    }
+
     public static PositionsDto toPositionsDto(final Positions positions) {
         return (positions.getPositions() != null) ? PositionsDto.builder()
                 .positions(positions.getPositions().stream().map(PositionBookMapper::toPositionDto).toList())
@@ -31,16 +41,6 @@ public class PositionBookMapper {
                                 .quantity(event.getQuantity())
                                 .build())
                         .toList())
-                .build();
-    }
-
-    private static Event toEventDomain(final EventDto eventDto) {
-        return Event.builder()
-                .id(eventDto.getId())
-                .action(toActionTypeDomain(eventDto.getAction()))
-                .account(eventDto.getAccount())
-                .security(eventDto.getSecurity())
-                .quantity(eventDto.getQuantity())
                 .build();
     }
 

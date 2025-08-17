@@ -14,40 +14,11 @@ public class PositionBookService {
 
     private final Map<String, List<Event>> positionBook = new HashMap<>();
     private final Map<String, Integer> totalQuantityMap = new HashMap<>();
+    private final Map<Integer, Event> idEventMap = new HashMap<>();
 
     public Positions createTradeEvent(final Events events){
-        final Map<Integer, Event> idToEventMap = new HashMap<>();
-
         for ( final Event event: events.getEvents()) {
-            final String key = event.getAccount() + "-" + event.getSecurity();
-            final List<Event> persistedEventList = positionBook.computeIfAbsent(key, k -> new ArrayList<>());
-            persistedEventList.add(event);
-
-            int persistedTotal = totalQuantityMap.getOrDefault(key, 0);
-            switch (event.getAction()) {
-                case BUY:
-                    persistedTotal += event.getQuantity();
-                    idToEventMap.put(event.getId(), event);
-                    break;
-                case SELL:
-                    persistedTotal -= event.getQuantity();
-                    idToEventMap.put(event.getId(), event);
-                    break;
-                case CANCEL:
-                    final Event originalEvent = idToEventMap.get(event.getId());
-                    if (originalEvent != null) {
-                        if (originalEvent.getAction() == ActionType.BUY) {
-                            persistedTotal -= originalEvent.getQuantity();
-                        } else if (originalEvent.getAction() == ActionType.SELL) {
-                            persistedTotal += originalEvent.getQuantity();
-                        }
-                        idToEventMap.remove(event.getId());
-                    }
-                    break;
-                default:
-                    throw new InvalidTradeEventException("Unknown action type: " + event.getAction());
-            }
-            totalQuantityMap.put(key, persistedTotal);
+            addSingleTradeEvent(event);
         }
         return getAllPositions();
     }
@@ -71,5 +42,42 @@ public class PositionBookService {
             response.getPositions().add(position);
         }
         return response;
+    }
+
+    public Positions createSingleTradeEvent(final Event event) {
+        addSingleTradeEvent(event);
+        return getAllPositions();
+    }
+
+    private void addSingleTradeEvent(final Event event) {
+        final String key = event.getAccount() + "-" + event.getSecurity();
+        final List<Event> persistedEventList = positionBook.computeIfAbsent(key, k -> new ArrayList<>());
+        persistedEventList.add(event);
+
+        int persistedTotal = totalQuantityMap.getOrDefault(key, 0);
+        switch (event.getAction()) {
+            case BUY:
+                persistedTotal += event.getQuantity();
+                idEventMap.put(event.getId(), event);
+                break;
+            case SELL:
+                persistedTotal -= event.getQuantity();
+                idEventMap.put(event.getId(), event);
+                break;
+            case CANCEL:
+                final Event originalEvent = idEventMap.get(event.getId());
+                if (originalEvent != null) {
+                    if (originalEvent.getAction() == ActionType.BUY) {
+                        persistedTotal -= originalEvent.getQuantity();
+                    } else if (originalEvent.getAction() == ActionType.SELL) {
+                        persistedTotal += originalEvent.getQuantity();
+                    }
+                    idEventMap.remove(event.getId());
+                }
+                break;
+            default:
+                throw new InvalidTradeEventException("Unknown action type: " + event.getAction());
+        }
+        totalQuantityMap.put(key, persistedTotal);
     }
 }
