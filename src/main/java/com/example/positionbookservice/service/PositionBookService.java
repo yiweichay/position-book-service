@@ -1,8 +1,9 @@
 package com.example.positionbookservice.service;
 
 import com.example.positionbookservice.entity.*;
+import com.example.positionbookservice.exception.DuplicatedEventIDBadRequestException;
 import com.example.positionbookservice.exception.InvalidTradeEventException;
-import com.example.positionbookservice.exception.TradeEventNotFoundException;
+import com.example.positionbookservice.exception.TradeEventIDNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -50,6 +51,7 @@ public class PositionBookService {
     }
 
     private void addSingleTradeEvent(final Event event) {
+        checkIfIDExists(event);
         final PositionBookKey positionBookKey = new PositionBookKey(event.getAccount(), event.getSecurity());
         final List<Event> persistedEventList = positionBook.computeIfAbsent(positionBookKey, k -> new ArrayList<>());
         persistedEventList.add(event);
@@ -74,12 +76,18 @@ public class PositionBookService {
                     }
                     idEventMap.remove(event.getId());
                 } else {
-                    throw new TradeEventNotFoundException("Event with id " + event.getId() + " not found");
+                    throw new TradeEventIDNotFoundException("Event with id " + event.getId() + " not found for trade cancellation");
                 }
                 break;
             default:
                 throw new InvalidTradeEventException("Unknown action type: " + event.getAction());
         }
         totalQuantityMap.put(positionBookKey, persistedTotal);
+    }
+
+    private void checkIfIDExists(final Event event) {
+        if (idEventMap.containsKey(event.getId()) && event.getAction() != ActionType.CANCEL) {
+            throw new DuplicatedEventIDBadRequestException("Event with ID " + event.getId() + " already exists");
+        }
     }
 }

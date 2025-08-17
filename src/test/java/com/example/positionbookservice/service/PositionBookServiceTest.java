@@ -5,6 +5,8 @@ import com.example.positionbookservice.entity.Event;
 import com.example.positionbookservice.entity.Events;
 import com.example.positionbookservice.entity.Positions;
 import com.example.positionbookservice.entity.Position;
+import com.example.positionbookservice.exception.DuplicatedEventIDBadRequestException;
+import com.example.positionbookservice.exception.TradeEventIDNotFoundException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -76,6 +78,40 @@ public class PositionBookServiceTest {
             } else if (position.getSecurity().equals("SEC2")) {
                 assertEquals(200, position.getQuantity());
             }
+        }
+    }
+
+    @Test
+    void throwExceptionWhenIDExists() {
+        final PositionBookService positionBookService = new PositionBookService();
+
+        Event buyEvent1 = new Event(1, ActionType.BUY, "ACC1", "SEC1", 100);
+        Event buyEvent2 = new Event(1, ActionType.BUY, "ACC1", "SEC1", 50);
+        Events events = new Events();
+        events.getEvents().add(buyEvent1);
+        events.getEvents().add(buyEvent2);
+
+        try {
+            positionBookService.createTradeEvent(events);
+        } catch (final DuplicatedEventIDBadRequestException e) {
+            assertEquals("Event with ID 1 already exists", e.getMessage());
+        }
+    }
+
+    @Test
+    void throwTradeEventIDNotFoundException() {
+        final PositionBookService positionBookService = new PositionBookService();
+
+        Event buyEvent1 = new Event(1, ActionType.BUY, "ACC1", "SEC1", 100);
+        Event cancelEvent = new Event(2, ActionType.CANCEL, "ACC1", "SEC1", 0);
+        Events events = new Events();
+        events.getEvents().add(buyEvent1);
+        events.getEvents().add(cancelEvent);
+
+        try {
+            positionBookService.createTradeEvent(events);
+        } catch (final TradeEventIDNotFoundException e) {
+            assertEquals("Event with id 2 not found for trade cancellation", e.getMessage());
         }
     }
 }
