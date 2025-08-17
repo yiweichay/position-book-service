@@ -21,7 +21,7 @@ Three HashMaps were used to store the position book, the totalQuantity of trades
 - **DuplicatedEventIDBadRequestException**: Thrown when the given trade event ID already exists in the position book for BUY/SELL events. [HTTP status code: 400 bad request]
 
 ### CORS configuration
-Cross-Origin Resource Sharing (CORS) is configured to allow requests from http://localhost:3000
+Cross-Origin Resource Sharing (CORS) is configured to allow GET and POST requests from http://localhost:3000
 
 ## Tech and Getting Started
 This project is built using Spring Boot and Gradle. To get started, you can clone the repository and run the application using the following commands:
